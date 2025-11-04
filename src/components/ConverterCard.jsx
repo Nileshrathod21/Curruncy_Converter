@@ -76,7 +76,7 @@ export default function ConverterCard() {
         <div className="text-sm text-gray-300">Rate: {rateDisplay}</div>
         <div className="text-2xl font-bold text-white mt-2 result-anim">
           <span className="mr-2">{fromIcon}</span>
-          {numericAmount} {from} = {resultDisplay} {to}
+          {numericAmount} {from} = {rateDisplay} {to}
           <span className="ml-2">{toIcon}</span>
         </div>
       </div>
