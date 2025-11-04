@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import useFetchRates from '../hooks/useFetchRates';
 import CurrencySelect from './CurrencySelect';
+import { CURRENCY_META } from '../utils/currencies';
 
 export default function ConverterCard() {
   const [from, setFrom] = useState('USD');
@@ -20,12 +21,12 @@ export default function ConverterCard() {
   const numericAmount = Number(amount) || 0;
   const rateFromApi = data?.info?.rate;
   const apiResult = typeof data?.result === 'number' ? data.result : null;
-  const computedResult =
-    apiResult != null
-      ? apiResult
-      : rateFromApi
-      ? numericAmount * rateFromApi
-      : null;
+  let computedResult = null;
+  if (apiResult !== null && apiResult !== undefined) {
+    computedResult = apiResult;
+  } else if (rateFromApi !== null && rateFromApi !== undefined) {
+    computedResult = numericAmount * rateFromApi;
+  }
 
   useEffect(() => {
     localStorage.setItem('conv_history', JSON.stringify(history));
@@ -60,7 +61,9 @@ export default function ConverterCard() {
   // prepare display values and middle content to avoid nested ternaries in JSX
   const rateDisplay = rateFromApi ?? '—';
   const resultDisplay =
-    computedResult != null ? computedResult.toFixed(2) : '—';
+    computedResult === null ? '—' : computedResult.toFixed(2);
+  const fromIcon = CURRENCY_META[from]?.icon ?? '';
+  const toIcon = CURRENCY_META[to]?.icon ?? '';
 
   let middleContent = null;
   if (loading) {
@@ -72,7 +75,9 @@ export default function ConverterCard() {
       <div className="text-center">
         <div className="text-sm text-gray-300">Rate: {rateDisplay}</div>
         <div className="text-2xl font-bold text-white mt-2 result-anim">
+          <span className="mr-2">{fromIcon}</span>
           {numericAmount} {from} = {resultDisplay} {to}
+          <span className="ml-2">{toIcon}</span>
         </div>
       </div>
     );
@@ -109,12 +114,12 @@ export default function ConverterCard() {
       {middleContent}
 
       <div className="mt-4 flex gap-2">
-        {/* <button
+        <button
           onClick={() => refetch()}
           className="p-2 bg-blue-500 rounded-md"
         >
           {loading ? 'Converting...' : 'Convert'}
-        </button> */}
+        </button>
 
         <button
           onClick={saveFav}
